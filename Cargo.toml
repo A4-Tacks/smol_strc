@@ -5,7 +5,7 @@ description = "smol_str forks, replace Arc with Rc"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/A4-Tacks/smol_strc"
 authors = ["Aleksey Kladov <aleksey.kladov@gmail.com>", "Lukas Wirth <lukastw97@gmail.com>"]
-edition = "2021"
+edition = "2024"
 rust-version = "1.89"
 keywords = ["smol_str", "small", "string", "inline", "stack"]
 
