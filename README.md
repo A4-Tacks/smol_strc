@@ -1,5 +1,14 @@
 > [!IMPORTANT]
-> This crate now lives in https://github.com/rust-lang/rust-analyzer/tree/master/lib/smol_str
+> This crate is a fork of [`smol_str`], And publish it again as [`smol_strc`]
+>
+> Replacing `Arc` with `Rc` to improve single threaded performance
+>
+> Independently maintained, but patches may be pulled from the source repo
+
+[`smol_str`]: https://github.com/rust-analyzer/smol_str
+[`smol_strc`]: https://crates.io/crates/smol_strc
+
+**After this line is the original README**
 
 # smol_str
 
