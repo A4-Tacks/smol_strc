@@ -1,12 +1,13 @@
 [package]
-name = "smol_str"
+name = "smol_strc"
 version = "0.3.4"
-description = "small-string optimized string type with O(1) clone"
+description = "smol_str forks, replace Arc with Rc"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/rust-analyzer/smol_str"
+repository = "https://github.com/A4-Tacks/smol_strc"
 authors = ["Aleksey Kladov <aleksey.kladov@gmail.com>", "Lukas Wirth <lukastw97@gmail.com>"]
 edition = "2021"
 rust-version = "1.89"
+keywords = ["smol_str", "small", "string", "inline", "stack"]
 
 [package.metadata.docs.rs]
 rustdoc-args = ["--cfg", "docsrs"]
