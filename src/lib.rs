@@ -1,9 +1,10 @@
+//! Fork from https://github.com/rust-analyzer/smol_str, replacing `Arc` with `Rc`
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
 extern crate alloc;
 
-use alloc::{borrow::Cow, boxed::Box, string::String, sync::Arc};
+use alloc::{borrow::Cow, boxed::Box, rc::Rc, string::String};
 use core::{
     borrow::Borrow,
     cmp::{self, Ordering},
@@ -389,9 +390,9 @@ impl From<Box<str>> for SmolStr {
     }
 }
 
-impl From<Arc<str>> for SmolStr {
+impl From<Rc<str>> for SmolStr {
     #[inline]
-    fn from(s: Arc<str>) -> SmolStr {
+    fn from(s: Rc<str>) -> SmolStr {
         let repr = Repr::new_on_stack(s.as_ref()).unwrap_or(Repr::Heap(s));
         Self(repr)
     }
@@ -404,7 +405,7 @@ impl<'a> From<Cow<'a, str>> for SmolStr {
     }
 }
 
-impl From<SmolStr> for Arc<str> {
+impl From<SmolStr> for Rc<str> {
     #[inline(always)]
     fn from(text: SmolStr) -> Self {
         match text.0 {
@@ -495,7 +496,7 @@ enum Repr {
         buf: [u8; INLINE_CAP],
     },
     Static(&'static str),
-    Heap(Arc<str>),
+    Heap(Rc<str>),
 }
 
 impl Repr {
@@ -536,7 +537,7 @@ impl Repr {
     }
 
     fn new(text: &str) -> Self {
-        Self::new_on_stack(text).unwrap_or_else(|| Repr::Heap(Arc::from(text)))
+        Self::new_on_stack(text).unwrap_or_else(|| Repr::Heap(Rc::from(text)))
     }
 
     #[inline(always)]
@@ -574,7 +575,7 @@ impl Repr {
 
     fn ptr_eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self::Heap(l0), Self::Heap(r0)) => Arc::ptr_eq(l0, r0),
+            (Self::Heap(l0), Self::Heap(r0)) => Rc::ptr_eq(l0, r0),
             (Self::Static(l0), Self::Static(r0)) => core::ptr::eq(l0, r0),
             (
                 Self::Inline {
