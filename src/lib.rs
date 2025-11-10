@@ -1,4 +1,4 @@
-//! Fork from https://github.com/rust-analyzer/smol_str, replacing `Arc` with `Rc`
+//! Fork from <https://github.com/rust-analyzer/smol_str>, replacing `Arc` with `Rc`
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
