@@ -116,10 +116,7 @@ impl Clone for SmolStr {
 impl Default for SmolStr {
     #[inline(always)]
     fn default() -> SmolStr {
-        SmolStr(Repr::Inline {
-            len: InlineSize::_V0,
-            buf: [0; INLINE_CAP],
-        })
+        SmolStr(Repr::Inline { len: InlineSize::_V0, buf: [0; INLINE_CAP] })
     }
 }
 
@@ -246,11 +243,8 @@ fn from_buf_and_chars(
 ) -> SmolStr {
     let min_size = iter.size_hint().0 + buf_len;
     if min_size > INLINE_CAP {
-        let heap: String = core::str::from_utf8(&buf[..buf_len])
-            .unwrap()
-            .chars()
-            .chain(iter)
-            .collect();
+        let heap: String =
+            core::str::from_utf8(&buf[..buf_len]).unwrap().chars().chain(iter).collect();
         if heap.len() <= INLINE_CAP {
             // size hint lied
             return SmolStr::new_inline(&heap);
@@ -491,10 +485,7 @@ impl InlineSize {
 
 #[derive(Clone, Debug)]
 enum Repr {
-    Inline {
-        len: InlineSize,
-        buf: [u8; INLINE_CAP],
-    },
+    Inline { len: InlineSize, buf: [u8; INLINE_CAP] },
     Static(&'static str),
     Heap(Rc<str>),
 }
@@ -522,10 +513,8 @@ impl Repr {
         if len <= N_NEWLINES + N_SPACES {
             let bytes = text.as_bytes();
             let possible_newline_count = cmp::min(len, N_NEWLINES);
-            let newlines = bytes[..possible_newline_count]
-                .iter()
-                .take_while(|&&b| b == b'\n')
-                .count();
+            let newlines =
+                bytes[..possible_newline_count].iter().take_while(|&&b| b == b'\n').count();
             let possible_space_count = len - newlines;
             if possible_space_count <= N_SPACES && bytes[newlines..].iter().all(|&b| b == b' ') {
                 let spaces = possible_space_count;
@@ -577,16 +566,9 @@ impl Repr {
         match (self, other) {
             (Self::Heap(l0), Self::Heap(r0)) => Rc::ptr_eq(l0, r0),
             (Self::Static(l0), Self::Static(r0)) => core::ptr::eq(l0, r0),
-            (
-                Self::Inline {
-                    len: l_len,
-                    buf: l_buf,
-                },
-                Self::Inline {
-                    len: r_len,
-                    buf: r_buf,
-                },
-            ) => l_len == r_len && l_buf == r_buf,
+            (Self::Inline { len: l_len, buf: l_buf }, Self::Inline { len: r_len, buf: r_buf }) => {
+                l_len == r_len && l_buf == r_buf
+            }
             _ => false,
         }
     }
@@ -650,11 +632,7 @@ impl StrExt for str {
         let len = self.len();
         if len <= INLINE_CAP {
             let (buf, rest) = inline_convert_while_ascii(self, u8::to_ascii_lowercase);
-            from_buf_and_chars(
-                buf,
-                len - rest.len(),
-                rest.chars().flat_map(|c| c.to_lowercase()),
-            )
+            from_buf_and_chars(buf, len - rest.len(), rest.chars().flat_map(|c| c.to_lowercase()))
         } else {
             self.to_lowercase().into()
         }
@@ -665,11 +643,7 @@ impl StrExt for str {
         let len = self.len();
         if len <= INLINE_CAP {
             let (buf, rest) = inline_convert_while_ascii(self, u8::to_ascii_uppercase);
-            from_buf_and_chars(
-                buf,
-                len - rest.len(),
-                rest.chars().flat_map(|c| c.to_uppercase()),
-            )
+            from_buf_and_chars(buf, len - rest.len(), rest.chars().flat_map(|c| c.to_uppercase()))
         } else {
             self.to_uppercase().into()
         }
@@ -879,10 +853,7 @@ enum SmolStrBuilderRepr {
 impl Default for SmolStrBuilderRepr {
     #[inline]
     fn default() -> Self {
-        SmolStrBuilderRepr::Inline {
-            buf: [0; INLINE_CAP],
-            len: 0,
-        }
+        SmolStrBuilderRepr::Inline { buf: [0; INLINE_CAP], len: 0 }
     }
 }
 
@@ -890,10 +861,7 @@ impl SmolStrBuilder {
     /// Creates a new empty [`SmolStrBuilder`].
     #[must_use]
     pub const fn new() -> Self {
-        Self(SmolStrBuilderRepr::Inline {
-            buf: [0; INLINE_CAP],
-            len: 0,
-        })
+        Self(SmolStrBuilderRepr::Inline { buf: [0; INLINE_CAP], len: 0 })
     }
 
     /// Builds a [`SmolStr`] from `self`.
