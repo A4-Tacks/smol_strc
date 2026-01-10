@@ -1,6 +1,6 @@
 use criterion::{criterion_group, criterion_main, Criterion};
 use rand::distr::{Alphanumeric, SampleString};
-use smol_str::{format_smolstr, SmolStr, StrExt, ToSmolStr};
+use smol_strc::{format_smolstr, SmolStr, StrExt, ToSmolStr};
 use std::hint::black_box;
 
 /// 12: small (inline)

@@ -1,9 +1,9 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 #[cfg(not(miri))]
 use proptest::{prop_assert, prop_assert_eq, proptest};
 
-use smol_str::{SmolStr, SmolStrBuilder};
+use smol_strc::{SmolStr, SmolStrBuilder};
 
 #[test]
 #[cfg(target_pointer_width = "64")]
@@ -11,11 +11,12 @@ fn smol_str_is_smol() {
     assert_eq!(::std::mem::size_of::<SmolStr>(), ::std::mem::size_of::<String>(),);
 }
 
-#[test]
-fn assert_traits() {
-    fn f<T: Send + Sync + ::std::fmt::Debug + Clone>() {}
-    f::<SmolStr>();
-}
+// NOTE smol_strc uses Rc instead of Arc
+//#[test]
+//fn assert_traits() {
+//    fn f<T: Send + Sync + ::std::fmt::Debug + Clone>() {}
+//    f::<SmolStr>();
+//}
 
 #[test]
 fn conversions() {
@@ -23,8 +24,8 @@ fn conversions() {
     let s: String = s.into();
     assert_eq!(s, "Hello, World!");
 
-    let s: SmolStr = Arc::<str>::from("Hello, World!").into();
-    let s: Arc<str> = s.into();
+    let s: SmolStr = Rc::<str>::from("Hello, World!").into();
+    let s: Rc<str> = s.into();
     assert_eq!(s.as_ref(), "Hello, World!");
 }
 
@@ -243,13 +244,13 @@ fn test_bad_size_hint_char_iter() {
 
 #[test]
 fn test_to_smolstr() {
-    use smol_str::ToSmolStr;
+    use smol_strc::ToSmolStr;
 
     for i in 0..26 {
         let a = &"abcdefghijklmnopqrstuvwxyz"[i..];
 
         assert_eq!(a, a.to_smolstr());
-        assert_eq!(a, smol_str::format_smolstr!("{}", a));
+        assert_eq!(a, smol_strc::format_smolstr!("{}", a));
     }
 }
 
@@ -333,7 +334,7 @@ fn test_builder_push() {
 
 #[cfg(test)]
 mod test_str_ext {
-    use smol_str::StrExt;
+    use smol_strc::StrExt;
 
     #[test]
     fn large() {
@@ -395,7 +396,7 @@ mod test_str_ext {
 #[cfg(feature = "borsh")]
 mod borsh_tests {
     use borsh::BorshDeserialize;
-    use smol_str::{SmolStr, ToSmolStr};
+    use smol_strc::{SmolStr, ToSmolStr};
     use std::io::Cursor;
 
     #[test]
