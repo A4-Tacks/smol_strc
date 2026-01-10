@@ -45,7 +45,7 @@ fn try_main() -> Result<()> {
     }
 
     let current_branch = shell_output("git branch --show-current")?;
-    if &current_branch == "master" {
+    if &current_branch == "master" && false {
         let _s = Section::new("PUBLISH");
         let manifest = fs::read_to_string(&cargo_toml)?;
         let version = get_field(&manifest, "version")?;
