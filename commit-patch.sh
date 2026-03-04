@@ -34,6 +34,6 @@ cat -- "$@" > "$file"
 
 author=$(grep -Po 'Author:\s*\K\S.*' "$file" || exit)
 date=$(grep -Po 'Date:\s*\K\S.*' "$file" || exit)
-body=$(awk '/^    /{sub("^    ", "");print}/^diff/{exit}' patch || exit)
+body=$(awk '/^    /{sub("^    ", "");print}/^diff/{exit}' "$file" || exit)
 
 git commit -am "patch: $body" --author="$author" --date="$date"
