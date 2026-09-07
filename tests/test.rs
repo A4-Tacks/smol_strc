@@ -1,3 +1,8 @@
+#![expect(
+    clippy::disallowed_types,
+    reason = "the hash maps are only used in tests -- adding a dependency on `rustc_hash` to avoid that is not justified"
+)]
+
 use std::rc::Rc;
 
 #[cfg(not(miri))]
