@@ -34,3 +34,6 @@ jobs:
     - run: rustc ./.github/ci.rs && ./ci
       #env:
       #  CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+
+    - run: rustup component add miri --toolchain nightly
+    - run: cargo +nightly miri test
