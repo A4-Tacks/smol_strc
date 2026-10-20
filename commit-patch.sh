@@ -24,16 +24,47 @@ function CATCH_ERROR { # {{{
 trap CATCH_ERROR ERR # }}}
 
 if [[ ${1-} = -h ]]; then
-    printf 'Usage: %q [PATCH]\n' "${0##*/}"
+    printf 'Usage: %q <hash>\n' "${0##*/}"
     exit
 fi
 
+hash awk sed git mktemp rm vim grep jq
+
+# git -C rust-analyzer log --oneline ./lib/smol_str | vim -
+
+test -d ./rust-analyzer # needs origin repo
+test $# = 1
+
 file=$(mktemp pull-patch.XXXXXXXXXX)
 trap 'rm "$file"' exit
-cat -- "$@" > "$file"
 
-author=$(grep -Po 'Author:\s*\K\S.*' "$file" || exit)
-date=$(grep -Po 'Date:\s*\K\S.*' "$file" || exit)
+subst=(
+    -e 's/\bsync::Arc\b/rc::Rc/g'
+    -e 's/\bArc\b/Rc/g'
+    -e 's/\bsmol_str\b/&c/g'
+)
+
+git rebase HEAD^ # check clean
+
+git -C rust-analyzer show "$1" ./lib/smol_str > "$file"
+
+commit=$(head "$file" -n1)
+author=$(head "$file" | grep -Po 'Author:\s*\K\S.*' || exit)
+date=$(head "$file" | grep -Po 'Date:\s*\K\S.*' || exit)
 body=$(awk '/^    /{sub("^    ", "");print}/^diff/{exit}' "$file" || exit)
+
+body=$(jq --arg c "$commit" -rsR 'sub("\r?\n\r?\n|$"; "\n\n"+$c+"\n\n")|rtrim' <<< "$body")
+
+printf -- '-- body --\n%s\n-- end --\n' "$body"
+
+sed -i "${subst[@]}" "$file"
+
+until git apply -p3 --recount --reject < "$file"; do
+    git restore .
+    read -rp 'edit?'
+    vim "$file"
+done
+
+case $commit in commit*);;*) false; esac
 
 git commit -am "patch: $body" --author="$author" --date="$date"
